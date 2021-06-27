@@ -5,7 +5,7 @@ in .NET 5 and .NET 6 Preview.
 
 1. Compile [profiler library](profiler)
 2. Compile [demo](demo)
-3. Run the demo with the profiler library: `bash profiler.sh`
+3. Run the demo with the profiler library: `bash profile.sh`
 
 Example output:
 
