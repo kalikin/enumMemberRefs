@@ -75,12 +75,20 @@ private:
     ICorProfilerInfo12 *_pCorProfilerInfo12;
     std::atomic<int> _refCount;
 
+    int _totalEnumeratedMemberRefs;
+    int _totalEnumeratedTypeRefs;
+
+    void enumMemberRefs(IMetaDataImport2* metaDataImport, mdTypeRef typeRef);
+    void enumTypeRefs(IMetaDataImport2* metaDataImport);
+
 public:
 
     CorProfiler();
     virtual ~CorProfiler();
     HRESULT STDMETHODCALLTYPE Initialize(IUnknown* pICorProfilerInfoUnk) override;
     HRESULT STDMETHODCALLTYPE Shutdown() override;
+    HRESULT STDMETHODCALLTYPE ModuleLoadStarted(ModuleID moduleId) override;
+    HRESULT STDMETHODCALLTYPE ModuleLoadFinished(ModuleID moduleId, HRESULT hrStatus) override;
 
     // Profilers must implement all the methods on whatever ICorProfiler* interfaces they override to satisfy the compiler, 
     // even if they are never used
@@ -92,8 +100,6 @@ public:
     HRESULT STDMETHODCALLTYPE AssemblyLoadFinished(AssemblyID assemblyId, HRESULT hrStatus) override { return S_OK; }
     HRESULT STDMETHODCALLTYPE AssemblyUnloadStarted(AssemblyID assemblyId) override { return S_OK; }
     HRESULT STDMETHODCALLTYPE AssemblyUnloadFinished(AssemblyID assemblyId, HRESULT hrStatus) override { return S_OK; }
-    HRESULT STDMETHODCALLTYPE ModuleLoadStarted(ModuleID moduleId) override { return S_OK; }
-    HRESULT STDMETHODCALLTYPE ModuleLoadFinished(ModuleID moduleId, HRESULT hrStatus) override { return S_OK; }
     HRESULT STDMETHODCALLTYPE ModuleUnloadStarted(ModuleID moduleId) override { return S_OK; }
     HRESULT STDMETHODCALLTYPE ModuleUnloadFinished(ModuleID moduleId, HRESULT hrStatus) override { return S_OK; }
     HRESULT STDMETHODCALLTYPE ModuleAttachedToAssembly(ModuleID moduleId, AssemblyID AssemblyId) override { return S_OK; }

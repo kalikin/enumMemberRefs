@@ -21,7 +21,9 @@ using std::thread;
 
 CorProfiler::CorProfiler() :
     _pCorProfilerInfo12(),
-    _refCount(0)
+    _refCount(0),
+    _totalEnumeratedTypeRefs(0),
+    _totalEnumeratedMemberRefs(0)
 {
 
 }
@@ -45,6 +47,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown *pICorProfilerInfoUnk
     }
 
     if (FAILED(hr = _pCorProfilerInfo12->SetEventMask2(COR_PRF_MONITOR_JIT_COMPILATION
+                                                        | COR_PRF_MONITOR_MODULE_LOADS
                                                         | COR_PRF_DISABLE_ALL_NGEN_IMAGES,
                                                         0
                                                        )))
@@ -59,5 +62,59 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown *pICorProfilerInfoUnk
 
 HRESULT STDMETHODCALLTYPE CorProfiler::Shutdown()
 {
+    printf("TypeRefs:   %d\n", _totalEnumeratedTypeRefs);
+    printf("MemberRefs: %d\n", _totalEnumeratedMemberRefs);
     return S_OK;
+}
+
+
+HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadStarted(ModuleID moduleId)
+{
+    return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID moduleId, HRESULT hrStatus)
+{
+    if (SUCCEEDED(hrStatus))
+    {
+        CComPtr<IMetaDataImport2> metaDataImport;
+        if (SUCCEEDED(_pCorProfilerInfo12->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport2, (IUnknown**)&metaDataImport)))
+        {
+            enumTypeRefs(metaDataImport);
+        }
+    }
+    return S_OK;
+}
+
+void CorProfiler::enumTypeRefs(IMetaDataImport2* metaDataImport)
+{
+    HCORENUM enumerator = NULL;
+    mdTypeRef typeRef;
+    ULONG read = 0;
+    while (SUCCEEDED(metaDataImport->EnumTypeRefs(&enumerator, &typeRef, 1, &read)))
+    {
+        if (read == 0)
+        {
+            break;
+        }
+        _totalEnumeratedTypeRefs++;
+        enumMemberRefs(metaDataImport, typeRef);
+    }
+    metaDataImport->CloseEnum(enumerator);
+}
+
+void CorProfiler::enumMemberRefs(IMetaDataImport2* metaDataImport, mdTypeRef typeRef)
+{
+    HCORENUM enumerator = NULL;
+    mdMemberRef memberRef;
+    ULONG read = 0;
+    while (SUCCEEDED(metaDataImport->EnumMemberRefs(&enumerator, typeRef, &memberRef, 1, &read)))
+    {
+        if (read == 0)
+        {
+            break;
+        }
+        _totalEnumeratedMemberRefs++;
+    }
+    metaDataImport->CloseEnum(enumerator);
 }
