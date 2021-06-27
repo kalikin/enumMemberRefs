@@ -23,7 +23,7 @@ TypeRefs:   556
 <strong>MemberRefs: 0</strong>
 </pre>
 
-Here's the code snippet from [CorProfiler.cpp](profiler/src/CorProfiler.cpp) which counts *MemberRefs*:
+Here's the code snippet from [CorProfiler.cpp](https://github.com/kalikin/enumMemberRefs/blob/3b038ef0fe787771e91d4c9c239d342ceff9a8d5/profiler/src/CorProfiler.cpp#L111-L118) which counts *MemberRefs*:
 
 <pre>
     while (SUCCEEDED(metaDataImport->EnumMemberRefs(&enumerator, typeRef, &memberRef, 1, &read)))
