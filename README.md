@@ -3,8 +3,8 @@
 This example compares the behaviour of [IMetaDataImport::EnumMemberRefs](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/metadata/imetadataimport-enummemberrefs-method)
 in .NET 5 and .NET 6 Preview.
 
-1. Compile [profiler library](profiler/README.md)
-2. Compile [demo](demo/README.md)
+1. Compile [profiler library](profiler)
+2. Compile [demo](demo)
 3. Run the demo with the profiler library: `bash profiler.sh`
 
 Example output:
